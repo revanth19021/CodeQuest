@@ -30,7 +30,7 @@ public class SubmitAnswerServlet extends HttpServlet {
 
         if (session == null || session.getAttribute("userId") == null) {
             response.sendRedirect(
-                    request.getContextPath() + "/login.html");
+                    request.getContextPath() + "/login.jsp");
             return;
         }
 

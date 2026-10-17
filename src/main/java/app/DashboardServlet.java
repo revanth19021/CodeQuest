@@ -30,7 +30,7 @@ public class DashboardServlet extends HttpServlet {
 
         if (session == null || session.getAttribute("userId") == null) {
             response.sendRedirect(
-                    request.getContextPath() + "/login.html");
+                    request.getContextPath() + "/login.jsp");
             return;
         }
 
@@ -50,7 +50,7 @@ public class DashboardServlet extends HttpServlet {
                 if (!rs.next()) {
                     session.invalidate();
                     response.sendRedirect(
-                            request.getContextPath() + "/login.html");
+                            request.getContextPath() + "/login.jsp");
                     return;
                 }
 
@@ -101,7 +101,7 @@ public class DashboardServlet extends HttpServlet {
                     + "<p>Please check the database connection and try again.</p>"
                     + "<a style='color:#00d9ff' href='"
                     + request.getContextPath()
-                    + "/login.html'>Return to Login</a>"
+                    + "/login.jsp'>Return to Login</a>"
                     + "</body></html>");
         }
     }

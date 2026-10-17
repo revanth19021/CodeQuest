@@ -44,7 +44,7 @@
 
         <div class="form-footer">
             New player?
-            <a href="register.html">Create an account</a>
+            <a href="register.jsp">Create an account</a>
             <br>
             Administrator?
             <a href="admin-login.html">Admin Login</a>

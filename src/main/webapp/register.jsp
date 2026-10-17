@@ -54,7 +54,7 @@
 
         <div class="form-footer">
             Already have an account?
-            <a href="login.html">Login here</a>
+            <a href="login.jsp">Login here</a>
         </div>
     </div>
 </div>
