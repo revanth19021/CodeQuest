@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | CodeQuest</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav>
+    <div class="logo">Code<span>Quest</span></div>
+    <div class="links">
+        <a href="index.html">Home</a>
+        <a href="login.jsp">User Login</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-card">
+        <div class="card-icon" style="text-align:center;">♛</div>
+
+        <h2>Admin Login</h2>
+        <p class="subtitle">
+            Access the CodeQuest administration panel.
+        </p>
+
+        <form action="admin-login" method="post">
+            <label for="adminUsername">Admin Username</label>
+            <input type="text" id="adminUsername"
+                   name="username"
+                   placeholder="Enter admin username" required>
+
+            <label for="adminPassword">Password</label>
+            <input type="password" id="adminPassword"
+                   name="password"
+                   placeholder="Enter admin password" required>
+
+            <button type="submit" class="btn">Login as Admin</button>
+        </form>
+
+        <div class="form-footer">
+            <a href="index.html">Back to Home</a>
+        </div>
+    </div>
+</div>
+
+<footer>CodeQuest Administration</footer>
+
+</body>
+</html>
