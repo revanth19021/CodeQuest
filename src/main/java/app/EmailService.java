@@ -150,7 +150,7 @@ public class EmailService {
           + "cellpadding='0' style='margin:25px auto;'>"
           + "<tr><td align='center' style='background:#7c3aed;"
           + "border-radius:8px;'>"
-          + "<a href='http://localhost:8080/CodeQuest/login.jsp' "
+          + "<a href='https://codequest-2-ppmf.onrender.com/login.jsp' "
           + "style='display:inline-block;padding:15px 30px;"
           + "font-size:15px;font-weight:bold;color:#ffffff;"
           + "text-decoration:none;'>START YOUR JOURNEY &rarr;</a>"
@@ -179,6 +179,7 @@ public class EmailService {
 
         message.setContent(html, "text/html; charset=UTF-8");
 
+        mailSession.setDebug(true);
         Transport.send(message);
     }
 
