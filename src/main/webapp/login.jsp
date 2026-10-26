@@ -15,6 +15,8 @@
 </head>
 <body>
 
+
+
 <nav>
     <div class="logo">Code<span>Quest</span></div>
     <div class="links">
@@ -27,6 +29,36 @@
 
 <div class="container">
     <div class="form-card">
+    <%
+    String registered = request.getParameter("registered");
+    String emailStatus = request.getParameter("email");
+
+    if ("1".equals(registered)) {
+        if ("sent".equals(emailStatus)) {
+%>
+            <div class="success-message">
+                Registration successful! Your CodeQuest account
+                has been created. A welcome email has been sent
+                to your registered email address.
+            </div>
+<%
+        } else if ("failed".equals(emailStatus)) {
+%>
+            <div class="success-message">
+                Registration successful! Your CodeQuest account
+                has been created, but the welcome email could not
+                be sent. You can still log in.
+            </div>
+<%
+        } else {
+%>
+            <div class="success-message">
+                Registration successful! You can now log in.
+            </div>
+<%
+        }
+    }
+%>
         <h2>Welcome Back!</h2>
         <p class="subtitle">Login to continue your coding adventure.</p>
 

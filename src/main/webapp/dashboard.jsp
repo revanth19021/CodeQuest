@@ -79,10 +79,17 @@
         <a href="<%= request.getContextPath() %>/dashboard"
            class="active">Dashboard</a>
         <a href="<%= request.getContextPath() %>/missions">Missions</a>
+        
+        
         <a href="<%= request.getContextPath() %>/leaderboard.jsp">
             Leaderboard
         </a>
         <a href="<%= request.getContextPath() %>/logout">Logout</a>
+        <a href="${pageContext.request.contextPath}/download-result"
+   class="download-btn">
+    Download Performance Report (PDF)
+</a>
+        
     </div>
 </nav>
 
@@ -176,6 +183,7 @@
             <a href="<%= request.getContextPath() %>/leaderboard.jsp"
                class="btn btn-outline">View Rankings</a>
         </div>
+        
 
     </div>
 

@@ -100,12 +100,14 @@ public class RegisterServlet extends HttpServlet {
                 insertPS.setString(2, email);
                 insertPS.setString(3, password);
 
-                insertPS.executeUpdate();
-            }
+                int rows = insertPS.executeUpdate();
 
-            // Registration succeeded: redirect to the login page.
-            response.sendRedirect(
-                    request.getContextPath() + "/login.jsp?registered=1");
+                if (rows != 1) {
+                    showMessage(request, response,
+                            "Registration could not be completed.");
+                    return;
+                }
+            }
 
         } catch (SQLException e) {
             log("Unable to register CodeQuest user.", e);
@@ -113,6 +115,24 @@ public class RegisterServlet extends HttpServlet {
             showMessage(request, response,
                     "Registration could not be completed. "
                     + "Please check your details and try again.");
+            return;
+        }
+
+        // The account has been saved successfully.
+        // Email failure must not undo the registration.
+        try {
+            EmailService.sendWelcomeEmail(email, username);
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/login.jsp?registered=1&email=sent");
+
+        } catch (Exception e) {
+            log("Account created, but welcome email could not be sent.", e);
+
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/login.jsp?registered=1&email=failed");
         }
     }
 

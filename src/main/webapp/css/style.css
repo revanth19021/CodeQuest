@@ -269,3 +269,102 @@ footer {
         padding: 25px;
     }
 }
+
+
+/* Mission result page */
+.result-card {
+    max-width: 720px;
+    margin: 60px auto;
+    padding: 45px 30px;
+    text-align: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+.result-icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+.result-correct .result-icon {
+    background: #123b30;
+    color: #60e8a3;
+}
+
+.result-incorrect .result-icon {
+    background: #3b2330;
+    color: #ff8298;
+}
+
+.result-card h1 {
+    margin-bottom: 18px;
+    font-size: clamp(27px, 4vw, 38px);
+}
+
+.result-message {
+    color: var(--muted);
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+
+.xp-earned {
+    margin: 28px 0;
+    color: var(--cyan);
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.result-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 30px;
+}
+
+@media (max-width: 550px) {
+    .result-card {
+        margin: 30px auto;
+        padding: 30px 20px;
+    }
+
+    .result-actions {
+        flex-direction: column;
+    }
+
+    .result-actions .btn {
+        width: 100%;
+        text-align: center;
+    }
+}
+.download-btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #8b35ff, #00d9ff);
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 18px rgba(0, 217, 255, 0.25);
+}
+
+@media (max-width: 480px) {
+    .download-btn {
+        display: block;
+        text-align: center;
+        width: 100%;
+        box-sizing: border-box;
+    }
+}

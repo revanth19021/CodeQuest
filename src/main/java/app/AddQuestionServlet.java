@@ -6,7 +6,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -24,15 +23,11 @@ public class AddQuestionServlet extends HttpServlet {
                           HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("text/html;charset=UTF-8");
         request.setCharacterEncoding("UTF-8");
 
         HttpSession session = request.getSession(false);
 
-        // Only authenticated administrators can add questions
-        if (session == null
-                || session.getAttribute("adminId") == null) {
-
+        if (session == null || session.getAttribute("adminId") == null) {
             response.sendRedirect(
                     request.getContextPath() + "/admin-login.html");
             return;
@@ -42,6 +37,8 @@ public class AddQuestionServlet extends HttpServlet {
         String description = request.getParameter("description");
         String category = request.getParameter("category");
         String difficulty = request.getParameter("difficulty");
+        String questionType = request.getParameter("question_type");
+        String xpValue = request.getParameter("xp_reward");
 
         String optionA = request.getParameter("option_a");
         String optionB = request.getParameter("option_b");
@@ -49,25 +46,21 @@ public class AddQuestionServlet extends HttpServlet {
         String optionD = request.getParameter("option_d");
 
         String correctAnswer = request.getParameter("correct_answer");
-        String xpValue = request.getParameter("xp_reward");
+        String expectedAnswer = request.getParameter("expected_answer");
+        String starterCode = request.getParameter("starter_code");
+        String testCode = request.getParameter("test_code");
 
-        // Validate required fields
         if (isBlank(title) || isBlank(description)
                 || isBlank(category) || isBlank(difficulty)
-                || isBlank(optionA) || isBlank(optionB)
-                || isBlank(optionC) || isBlank(optionD)
-                || isBlank(correctAnswer) || isBlank(xpValue)) {
-
+                || isBlank(questionType) || isBlank(xpValue)) {
             showMessage(request, response,
-                    "Please fill in all the required fields.", "error");
+                    "Please fill in all common required fields.", "error");
             return;
         }
 
-        // Validate category and difficulty on the server
         if (!("Java".equals(category)
                 || "SQL".equals(category)
                 || "DSA".equals(category))) {
-
             showMessage(request, response,
                     "Please select a valid category.", "error");
             return;
@@ -76,19 +69,16 @@ public class AddQuestionServlet extends HttpServlet {
         if (!("Easy".equals(difficulty)
                 || "Medium".equals(difficulty)
                 || "Hard".equals(difficulty))) {
-
             showMessage(request, response,
                     "Please select a valid difficulty.", "error");
             return;
         }
 
-        if (!("A".equals(correctAnswer)
-                || "B".equals(correctAnswer)
-                || "C".equals(correctAnswer)
-                || "D".equals(correctAnswer))) {
-
+        if (!("MCQ".equals(questionType)
+                || "FILL_BLANK".equals(questionType)
+                || "CODING".equals(questionType))) {
             showMessage(request, response,
-                    "Please select a valid correct answer.", "error");
+                    "Please select a valid question type.", "error");
             return;
         }
 
@@ -102,42 +92,90 @@ public class AddQuestionServlet extends HttpServlet {
             return;
         }
 
-        if (xpReward < 1 || xpReward > 1000
-                || title.length() > 100
-                || optionA.length() > 255
-                || optionB.length() > 255
-                || optionC.length() > 255
-                || optionD.length() > 255) {
-
+        if (xpReward < 1 || xpReward > 1000 || title.length() > 100) {
             showMessage(request, response,
-                    "Check the title, options, and XP reward limits.",
+                    "Title or XP reward is outside the allowed limits.",
                     "error");
             return;
         }
 
-        String answerText;
+        // MCQ-specific validation
+        if ("MCQ".equals(questionType)) {
+            if (isBlank(optionA) || isBlank(optionB)
+                    || isBlank(optionC) || isBlank(optionD)
+                    || isBlank(correctAnswer)) {
+                showMessage(request, response,
+                        "MCQ questions require four options and a correct answer.",
+                        "error");
+                return;
+            }
 
-        switch (correctAnswer) {
-            case "A":
-                answerText = optionA;
-                break;
-            case "B":
-                answerText = optionB;
-                break;
-            case "C":
-                answerText = optionC;
-                break;
-            default:
-                answerText = optionD;
-                break;
+            if (!("A".equals(correctAnswer)
+                    || "B".equals(correctAnswer)
+                    || "C".equals(correctAnswer)
+                    || "D".equals(correctAnswer))) {
+                showMessage(request, response,
+                        "Correct answer must be A, B, C, or D.", "error");
+                return;
+            }
+
+            if (optionA.length() > 255 || optionB.length() > 255
+                    || optionC.length() > 255 || optionD.length() > 255) {
+                showMessage(request, response,
+                        "Each MCQ option must be 255 characters or fewer.",
+                        "error");
+                return;
+            }
+        }
+
+        // Fill-in-the-blanks validation
+        if ("FILL_BLANK".equals(questionType) && isBlank(expectedAnswer)) {
+            showMessage(request, response,
+                    "Enter the expected answer for the blank.", "error");
+            return;
+        }
+
+        // Coding-question validation
+        if ("CODING".equals(questionType)
+                && isBlank(expectedAnswer)) {
+            showMessage(request, response,
+                    "Enter the expected answer or solution for this coding question.",
+                    "error");
+            return;
+        }
+
+        String correctAnswerText = null;
+
+        if ("MCQ".equals(questionType)) {
+            switch (correctAnswer) {
+                case "A":
+                    correctAnswerText = optionA.trim();
+                    break;
+                case "B":
+                    correctAnswerText = optionB.trim();
+                    break;
+                case "C":
+                    correctAnswerText = optionC.trim();
+                    break;
+                case "D":
+                    correctAnswerText = optionD.trim();
+                    break;
+                default:
+                    showMessage(request, response,
+                            "Invalid correct answer.", "error");
+                    return;
+            }
+        } else {
+            correctAnswerText = expectedAnswer.trim();
         }
 
         String sql =
                 "INSERT INTO missions "
-                + "(title, description, category, difficulty, "
-                + "xp_reward, correct_answer, option_a, option_b, "
-                + "option_c, option_d, created_by) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "(title, description, category, difficulty, xp_reward, "
+                + "correct_answer, option_a, option_b, option_c, option_d, "
+                + "created_by, question_type, expected_answer, starter_code, "
+                + "test_code) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -147,31 +185,38 @@ public class AddQuestionServlet extends HttpServlet {
             ps.setString(3, category);
             ps.setString(4, difficulty);
             ps.setInt(5, xpReward);
-            ps.setString(6, answerText);
-            ps.setString(7, optionA.trim());
-            ps.setString(8, optionB.trim());
-            ps.setString(9, optionC.trim());
-            ps.setString(10, optionD.trim());
+            ps.setString(6, correctAnswerText);
+
+            // These fields can be NULL for non-MCQ questions.
+            ps.setString(7, "MCQ".equals(questionType) ? optionA.trim() : null);
+            ps.setString(8, "MCQ".equals(questionType) ? optionB.trim() : null);
+            ps.setString(9, "MCQ".equals(questionType) ? optionC.trim() : null);
+            ps.setString(10, "MCQ".equals(questionType) ? optionD.trim() : null);
+
             ps.setInt(11, (Integer) session.getAttribute("adminId"));
+            ps.setString(12, questionType);
+            ps.setString(13, "MCQ".equals(questionType)
+                    ? null : expectedAnswer.trim());
+            ps.setString(14, "CODING".equals(questionType)
+                    ? starterCode : null);
+            ps.setString(15, "CODING".equals(questionType)
+                    ? testCode : null);
 
             int rows = ps.executeUpdate();
 
             if (rows > 0) {
                 showMessage(request, response,
-                        "Question added successfully! It is now saved in MySQL.",
-                        "success");
+                        "Question added successfully!", "success");
             } else {
                 showMessage(request, response,
-                        "The question could not be saved. Please try again.",
-                        "error");
+                        "Question could not be saved.", "error");
             }
 
         } catch (SQLException e) {
             log("Unable to save CodeQuest question.", e);
-
             showMessage(request, response,
-                    "Unable to save the question. Please check the database "
-                    + "table structure and connection.", "error");
+                    "Unable to save the question. Check the database connection and table structure.",
+                    "error");
         }
     }
 
@@ -187,10 +232,11 @@ public class AddQuestionServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
 
-        session.setAttribute("questionMessage", message);
-        session.setAttribute("questionMessageType", type);
+        if (session != null) {
+            session.setAttribute("questionMessage", message);
+            session.setAttribute("questionMessageType", type);
+        }
 
-        // Redirect avoids duplicate insertion on browser refresh
         response.sendRedirect(
                 request.getContextPath() + "/add-question.jsp");
     }
